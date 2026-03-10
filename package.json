@@ -2,8 +2,9 @@
   "name": "projetointegrador3",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx --watch src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -21,5 +22,8 @@
     "eslint": "^9.39.2",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
   }
 }

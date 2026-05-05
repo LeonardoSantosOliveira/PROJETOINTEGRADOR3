@@ -1,5 +1,8 @@
 import "dotenv/config";
+
+import fastifyCors from "@fastify/cors";
 import fastifySwagger from "@fastify/swagger";
+import fastifyApiReference from "@scalar/fastify-api-reference";
 import Fastify from "fastify";
 import {
   jsonSchemaTransform,
@@ -8,14 +11,12 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import z from "zod";
+
 import { auth } from "./lib/auth.js";
-import fastifyCors from "@fastify/cors";
-import fastifyApiReference from "@scalar/fastify-api-reference";
-import { weekDay } from "./generated/prisma/enums.js";
-import { CreateWorkoutPlan } from "./usecases/CreateWorkoutPlan.js";
-import { fromNodeHeaders } from "better-auth/node";
-import { NotFoundError } from "./errors/index.js";
-import { ErrorSchema, WorkoutPlanSchema } from "./schemas/indes.js";
+import { aiRoutes } from "./routes/ai.js";
+import { homeRoutes } from "./routes/home.js";
+import { meRoutes } from "./routes/me.js";
+import { statsRoutes } from "./routes/stats.js";
 import { workoutPlanRoutes } from "./routes/workout-plan.js";
 
 const app = Fastify({
@@ -35,7 +36,7 @@ await app.register(fastifySwagger, {
     servers: [
       {
         description: "Localhost",
-        url: "http://localhost:8081",
+        url: "http://localhost:8080",
       },
     ],
   },
@@ -43,7 +44,7 @@ await app.register(fastifySwagger, {
 });
 
 await app.register(fastifyCors, {
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000"],
   credentials: true,
 });
 
@@ -54,7 +55,7 @@ await app.register(fastifyApiReference, {
       {
         title: "Projeto Integrador 3",
         slug: "projeto-integrador-3",
-        url: "swagger.json",
+        url: "/swagger.json",
       },
       {
         title: "Auth API",
@@ -65,13 +66,30 @@ await app.register(fastifyApiReference, {
   },
 });
 
+// RESTful
+// Routes
+await app.register(homeRoutes, { prefix: "/home" });
+await app.register(meRoutes, { prefix: "/me" });
+await app.register(statsRoutes, { prefix: "/stats" });
 await app.register(workoutPlanRoutes, { prefix: "/workout-plans" });
+await app.register(aiRoutes, { prefix: "/ai" });
+
+app.withTypeProvider<ZodTypeProvider>().route({
+  method: "GET",
+  url: "/swagger.json",
+  schema: {
+    hide: true,
+  },
+  handler: async () => {
+    return app.swagger();
+  },
+});
 
 app.withTypeProvider<ZodTypeProvider>().route({
   method: "GET",
   url: "/",
   schema: {
-    description: "Hello World",
+    description: "Hello world",
     tags: ["Hello World"],
     response: {
       200: z.object({

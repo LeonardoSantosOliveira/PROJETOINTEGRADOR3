@@ -1,8 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { openAPI } from "better-auth/plugins";
-import { prisma } from "./bd.js";
 
+import { prisma } from "./db.js";
 
 export const auth = betterAuth({
   trustedOrigins: ["http://localhost:3000"],

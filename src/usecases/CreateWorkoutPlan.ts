@@ -1,6 +1,6 @@
 import { NotFoundError } from "../errors/index.js";
-import type { weekDay } from "../generated/prisma/enums.js";
-import { prisma } from "../lib/bd.js";
+import { WeekDay } from "../generated/prisma/enums.js";
+import { prisma } from "../lib/db.js";
 
 // Data Transfer Object
 interface InputDto {
@@ -8,15 +8,15 @@ interface InputDto {
   name: string;
   workoutDays: Array<{
     name: string;
-    weekDay: weekDay;
+    weekDay: WeekDay;
     isRest: boolean;
     estimatedDurationInSeconds: number;
+    coverImageUrl?: string;
     exercises: Array<{
       order: number;
       name: string;
       sets: number;
       reps: number;
-      weight: number;
       restTimeInSeconds: number;
     }>;
   }>;
@@ -27,9 +27,10 @@ interface OutputDto {
   name: string;
   workoutDays: Array<{
     name: string;
-    weekDay: weekDay;
+    weekDay: WeekDay;
     isRest: boolean;
     estimatedDurationInSeconds: number;
+    coverImageUrl?: string;
     exercises: Array<{
       order: number;
       name: string;
@@ -67,13 +68,13 @@ export class CreateWorkoutPlan {
               weekDay: workoutDay.weekDay,
               isRest: workoutDay.isRest,
               estimatedDurationInSeconds: workoutDay.estimatedDurationInSeconds,
+              coverImageUrl: workoutDay.coverImageUrl,
               exercises: {
                 create: workoutDay.exercises.map((exercise) => ({
                   name: exercise.name,
                   order: exercise.order,
                   sets: exercise.sets,
                   reps: exercise.reps,
-                  weight: exercise.weight,
                   restTimeInSeconds: exercise.restTimeInSeconds,
                 })),
               },
@@ -102,6 +103,7 @@ export class CreateWorkoutPlan {
           weekDay: day.weekDay,
           isRest: day.isRest,
           estimatedDurationInSeconds: day.estimatedDurationInSeconds,
+          coverImageUrl: day.coverImageUrl ?? undefined,
           exercises: day.exercises.map((exercise) => ({
             order: exercise.order,
             name: exercise.name,

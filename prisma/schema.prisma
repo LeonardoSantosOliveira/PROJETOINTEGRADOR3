@@ -14,16 +14,20 @@ datasource db {
 }
 
 model User {
-  id            String        @id
-  workoutPlans  WorkoutPlan[]
-  name          String
-  email         String
-  emailVerified Boolean       @default(false)
-  image         String?
-  createdAt     DateTime      @default(now()) @db.Timestamptz()
-  updatedAt     DateTime      @updatedAt @db.Timestamptz()
-  sessions      Session[]
-  accounts      Account[]
+  id                  String        @id
+  workoutPlans        WorkoutPlan[]
+  name                String
+  email               String
+  emailVerified       Boolean       @default(false)
+  image               String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  sessions            Session[]
+  accounts            Account[]
+  weightInGrams       Int?
+  heightInCentimeters Int?
+  age                 Int?
+  bodyFatPercentage   Int? // 100 representa 100% 
 
   @@unique([email])
   @@map("user")
@@ -40,7 +44,7 @@ model WorkoutPlan {
   updatedAt   DateTime     @updatedAt @db.Timestamptz()
 }
 
-enum weekDay {
+enum WeekDay {
   MONDAY
   TUESDAY
   WEDNESDAY
@@ -56,9 +60,10 @@ model WorkoutDay {
   workoutPlanId              String
   workoutPlan                WorkoutPlan       @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
   isRest                     Boolean           @default(false)
-  weekDay                    weekDay
+  weekDay                    WeekDay
   exercises                  WorkoutExercise[]
   estimatedDurationInSeconds Int
+  coverImageUrl              String?
   createdAt                  DateTime          @default(now()) @db.Timestamptz()
   updatedAt                  DateTime          @updatedAt @db.Timestamptz()
   sessions                   WorkoutSession[]
@@ -72,7 +77,6 @@ model WorkoutExercise {
   workoutDay        WorkoutDay @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
   sets              Int
   reps              Int
-  weight            Int
   restTimeInSeconds Int
   createdAt         DateTime   @default(now()) @db.Timestamptz()
   updatedAt         DateTime   @updatedAt @db.Timestamptz()
@@ -84,8 +88,8 @@ model WorkoutSession {
   workoutDay   WorkoutDay @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
   startedAt    DateTime   @db.Timestamptz()
   completedAt  DateTime?  @db.Timestamptz()
-  CreatedAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  createdAt    DateTime   @default(now()) @db.Timestamptz()
+  updatedAt    DateTime   @updatedAt @db.Timestamptz()
 }
 
 model Session {
